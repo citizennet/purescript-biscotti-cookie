@@ -107,6 +107,35 @@ testSuite = do
         Cookie.parse "key=val" `shouldEqual` Right expected
 
     suite "parseMany" do
+      test "parse value wrapped in DQUOTEs" do
+        let
+          expected =
+            List.fromFoldable
+            [ Cookie.fromFields
+              { name: "key1"
+              , value: "val1"
+              , domain: Nothing
+              , path: Nothing
+              , expires: Nothing
+              , maxAge: Nothing
+              , sameSite: Nothing
+              , secure: false
+              , httpOnly: false
+              }
+            , Cookie.fromFields
+              { name: "key2"
+              , value: "\"Token 123\""
+              , domain: Nothing
+              , path: Nothing
+              , expires: Nothing
+              , maxAge: Nothing
+              , sameSite: Nothing
+              , secure: false
+              , httpOnly: false
+              }
+            ]
+
+        Cookie.parseMany "key1=val1; key2=\"Token 123\"" `shouldEqual` Right expected
       test "parses multiple name/value pairs only" do
         let
           expected =
