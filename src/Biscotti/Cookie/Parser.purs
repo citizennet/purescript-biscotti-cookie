@@ -26,8 +26,8 @@ import Data.Int as Int
 import Data.List (List)
 import Data.Maybe (Maybe(..))
 import Data.String as String
-import Text.Parsing.StringParser (ParseError, Parser, fail, runParser)
-import Text.Parsing.StringParser.CodePoints (eof, noneOf, string)
+import Text.Parsing.StringParser (ParseError, Parser, fail, runParser, try)
+import Text.Parsing.StringParser.CodePoints (char, eof, noneOf, string)
 import Text.Parsing.StringParser.Combinators (many, sepBy)
 
 type Attribute
@@ -100,8 +100,15 @@ parseAttribute =
 parseSimpleCookie :: Parser Cookie
 parseSimpleCookie = do
   name <- stringWithout ([ ';', ',', '=' ] <> whitespaceChars) <* string "="
-  value <- stringWithout ([ ';', ',' ] <> whitespaceChars)
+  value <- try stringLiteral <|> stringWithout ([ ';', ',' ] <> whitespaceChars)
   pure $ Cookie.new name value
+  where
+  stringLiteral :: Parser String
+  stringLiteral = do
+    _ <- char '"'
+    x <- stringWithout ['"']
+    _ <- char '"'
+    pure ("\"" <> x <> "\"")
 
 parseCookie :: Parser Cookie
 parseCookie = do
