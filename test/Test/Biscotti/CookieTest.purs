@@ -107,7 +107,7 @@ testSuite = do
         Cookie.parse "key=val" `shouldEqual` Right expected
 
     suite "parseMany" do
-      test "parse value wrapped in DQUOTEs" do
+      test "parse value wrapped in double-quotes" do
         let
           expected =
             List.fromFoldable
